@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "k5-job-search-db"
+version = "0.1.0"
+description = ""
+authors = ["vadimko4 <vad.informat@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+poetry-core = "^2.1.3"
+requests = "^2.32.4"
+python-dotenv = "^1.1.0"
+psycopg2 = "^2.9.10"
+config = "^0.5.1"
+
+
+[tool.poetry.group.lint.dependencies]
+flake8 = "^7.3.0"
+isort = "^6.0.1"
+mypy = "^1.16.1"
+
+
+[tool.black]
+line-length = 119
+exclude ='''
+(
+  /(
+    | \.git
+  )
+)'''
+
+
+[tool.isort]
+line_length = 119
+
+
+[tool.mypy]
+disallow_untyped_defs = true
+warn_return_any = true
+exclude = 'venv'
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
