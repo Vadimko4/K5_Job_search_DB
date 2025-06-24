@@ -1,9 +1,23 @@
 from src.hh_handler import HhHandler
 
-if __name__ == '__main__':
+
+def main():
+    """Основная функция программы - точка входа в проект"""
+
     my_hh = HhHandler()
+    print("\nПрограмма: подождите, получаю общую информацию о выбранных работодателях c www.hh.ru...")
     my_hh.get_employers_info()
-    # for emp in my_hh.employers:
-    #     print(emp)
+    print("Данные успешно получены")
+
+    print("\nПрограмма: теперь собираю данные о вакансиях этих работодателей c www.hh.ru\n"
+          "Обычно это происходит чуть дольше - немного терпения... ")
     my_hh.get_vacancies_info()
-    print(len(my_hh.vacancies))
+    print("\nИнформация успешно получена: ")
+    print(f'Я нашла для вас {len(my_hh.vacancies)} вакансий')
+
+    print("\nСекунду, сформирую из полученной информации базу данных... ")
+
+
+if __name__ == '__main__':
+    main()
+

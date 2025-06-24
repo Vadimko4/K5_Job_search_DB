@@ -1,5 +1,7 @@
 """Модуль с классом для работы с API HH"""
 from http.client import responses
+import time
+import random
 
 import requests
 from src.config import employers
@@ -105,8 +107,11 @@ class HhHandler:
                     raise ServerError("На стороне сервера произошла ошибка при обработке запроса")
 
             self.params['page'] = 0
-            print(len(self.vacancies))
-            input()
+
+            # Пауза между запросами в секундах
+            pause_duration = random.randint(2, 7)
+            time.sleep(pause_duration)
+
 
     def erase_old_vacancies(self):
         """Стирает ранее найденные вакансии для нового поиска"""
