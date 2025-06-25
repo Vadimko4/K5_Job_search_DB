@@ -29,7 +29,7 @@ class HhHandler:
         self.url_emp = 'https://api.hh.ru/employers'
         self.url_vac = 'https://api.hh.ru/vacancies'
         self.headers = {'User-Agent': 'HH-User-Agent'}
-        self.params = {'page': 0, 'per_page': 10} # получаем до 10 х 20 = 200 вакансий от каждой компании работодателя
+        self.params = {'page': 0, 'per_page': 2} # получаем до 2 х 20 = 40 вакансий от каждой компании работодателя
         self.employers = []
         self.vacancies = []
 
