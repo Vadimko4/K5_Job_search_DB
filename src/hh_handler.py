@@ -67,7 +67,7 @@ class HhHandler:
                     new_vacancies = []
                     for vacancy_dict in vacancies:
                         name = vacancy_dict['name']
-                        link = vacancy_dict['alternate_url']
+                        vacancy_url = vacancy_dict['alternate_url']
                         salary_info = vacancy_dict['salary']
                         # по поводу зарплаты рассматриваем разные случаи
                         if not salary_info:
@@ -88,7 +88,7 @@ class HhHandler:
                         new_vacancy_dict = dict()
                         new_vacancy_dict['employer_id'] = employer_id
                         new_vacancy_dict['vacancy_name'] = name
-                        new_vacancy_dict['link'] = link
+                        new_vacancy_dict['vacancy_url'] = vacancy_url
                         new_vacancy_dict['salary_from'] = salary_from
                         new_vacancy_dict['salary_to'] = salary_to
                         new_vacancy_dict['description'] = description
