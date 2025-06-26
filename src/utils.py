@@ -5,6 +5,32 @@ from src.hh_handler import HhHandler
 import psycopg2
 
 
+def user_menu_out():
+    """Функция выводит главное меню программы"""
+    print("\nВыберите дальнейшее действие")
+    print("""\n1. Получить список всех компаний с указанием количеством вакансий в базе
+2. Получить список всех вакансий в базе
+3. Получить среднюю зарплату по имеющимся вакансиям
+4. Вывести список вакансий, у которых зарплата выше средней по всем вакансиям
+5. Получить список вакансий, в названии которых содержится ключевое слово
+6. Выход из программы""")
+
+
+def foolproof_user_menu_input(menu_range_input: list[str]) -> str:
+    """
+    Функция выбора пользователя пункта меню - принимает от пользователя только
+    цифры, которые содержатся в menu_range_input
+    """
+    while True:
+        user_answer = input('\nПользователь: ')
+        if len(user_answer) != 1 or user_answer not in menu_range_input:
+            print(f"\nПрограмма: Неверный ввод, вам нужно ввести значение от {menu_range_input[0]} "
+                  f"до {menu_range_input[-1]} \nПопробуйте ещё раз")
+        else:
+            break
+    return user_answer
+
+
 def time_delay(delta_t: timedelta, delay_amount: int) -> None:
     """
     Вспомогательная сервисная функция задержки времени.
@@ -22,8 +48,8 @@ def create_database(database_name: str, params: dict) -> None:
     conn.autocommit = True
     cur = conn.cursor()
 
-    cur.execute(f'DROP DATABASE IF EXISTS {database_name}')
-    cur.execute(f'CREATE DATABASE {database_name}')
+    cur.execute(f"DROP DATABASE IF EXISTS {database_name}")
+    cur.execute(f"CREATE DATABASE {database_name}")
 
     cur.close()
     conn.close()
