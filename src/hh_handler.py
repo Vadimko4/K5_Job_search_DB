@@ -7,6 +7,9 @@ import requests
 from src.config import employers
 
 
+access_token = 'USERH2FNOK2KS7NPVHU2SQG4V2C05906OGGM0EM0TN566KHGBM8APFK3D3ULI11J'
+
+
 class ApiError(Exception):
     pass
 
@@ -28,6 +31,7 @@ class HhHandler:
         """Конструктор класса"""
         self.url_emp = 'https://api.hh.ru/employers'
         self.url_vac = 'https://api.hh.ru/vacancies'
+        # self.headers = {'Authorization': f'Bearer {access_token}'}
         self.headers = {'User-Agent': 'HH-User-Agent'}
         self.params = {'page': 0, 'per_page': 2} # получаем до 2 х 20 = 40 вакансий от каждой компании работодателя
         self.employers = []
@@ -108,9 +112,9 @@ class HhHandler:
 
             self.params['page'] = 0
 
-            # Пауза между запросами в секундах
-            pause_duration = random.randint(2, 7)
-            time.sleep(pause_duration)
+            # Пауза между запросами в секундах - когда не используем токен доступа к hh api
+            # pause_duration = random.randint(2, 7)
+            # time.sleep(pause_duration)
 
 
     def erase_old_vacancies(self):

@@ -29,7 +29,7 @@ def create_database(database_name: str, params: dict) -> None:
     conn.close()
 
     conn = psycopg2.connect(dbname=database_name, **params)
-    with conn.cursor() as cur: # employer_num SERIAL PRIMARY KEY,
+    with conn.cursor() as cur:
         cur.execute("""
                     CREATE TABLE employers (                        
                         employer_id INTEGER PRIMARY KEY,
@@ -60,7 +60,7 @@ def save_data_to_database(hh_object: HhHandler, database_name: str, params: dict
     """Сохранение данных о работодателях и вакансиях в базу данных"""
     conn = psycopg2.connect(dbname=database_name, **params)
     with conn.cursor() as cur:
-        # Сохранение данных о работодателях RETURNING employer_id
+        # Сохранение данных о работодателях
         for employer in hh_object.employers:
             cur.execute(
                 """
