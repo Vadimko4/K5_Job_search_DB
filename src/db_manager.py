@@ -22,6 +22,6 @@ class DBManager:
                         "LEFT JOIN vacancies v ON e.employer_id = v.employer_id "
                         "GROUP BY e.employer_name")
             rows = cur.fetchall()
+            print(f'\n{'-' * 150}')
             for row in rows:
-                print(row)
-                input()
+                print(f'Компания: {row[0]}\nВакансий: {row[1]}\n{'-' * 150}')
