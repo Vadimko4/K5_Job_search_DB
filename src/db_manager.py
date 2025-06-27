@@ -42,7 +42,8 @@ class DBManager:
                 if user_input == 'q':
                     return
 
-    def get_companies_and_vacancies_count(self):
+    def get_companies_and_vacancies_count(self) -> None:
+        """Получает список всех компаний и количество вакансий в базе у каждой компании"""
         conn = psycopg2.connect(dbname=self.database_name, **self.params)
         with conn.cursor() as cur:
             cur.execute("SELECT e.employer_name, COUNT(v.vacancy_id) AS vacancy_count "
@@ -56,13 +57,40 @@ class DBManager:
 
         conn.close()
 
-    def get_all_vacancies(self):
+    def get_all_vacancies(self) -> None:
+        """
+        Получает список всех вакансий в базе с указанием названия компании,
+        названия вакансии и зарплаты и ссылки на вакансию.
+        """
         conn = psycopg2.connect(dbname=self.database_name, **self.params)
         with conn.cursor() as cur:
             cur.execute("SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url "
                         "FROM employers e "
                         "LEFT JOIN vacancies v ON e.employer_id = v.employer_id")
             rows = cur.fetchall()
-            self.print_vacancies(rows)
+            if not rows:
+                print("\nПрограмма: в базе нет ни одной вакансии.")
+            else:
+                self.print_vacancies(rows)
+
+        conn.close()
+
+    def get_vacancies_with_keyword(self, keyword: str) -> None:
+        """
+        Получает список всех вакансий, в названии которых содержится ключевое слово keyword.
+        Регистр значения не имеет
+        """
+        conn = psycopg2.connect(dbname=self.database_name, **self.params)
+        with conn.cursor() as cur:
+            cur.execute("SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url "
+                        "FROM employers e "
+                        "LEFT JOIN vacancies v ON e.employer_id = v.employer_id "
+                        "WHERE v.vacancy_name ILIKE %s", ('%' + keyword + '%',))
+            rows = cur.fetchall()
+            if not rows:
+                print("\nПрограмма: нет ни одной вакансии по Вашему запросу.")
+            else:
+                print(f"\nПрограмма: по Вашему запросу найдено {len(rows)} вакансий.")
+                self.print_vacancies(rows)
 
         conn.close()

@@ -69,11 +69,9 @@ def main():
             print_vacancies(vacancies)
 
         if user_input == '5':  # список вакансий, в названии которых содержится ключевое слово
-            print("\nПрограмма: через пробел введите ключевые слова для поиска в описании вакансии")
-            user_answer = input('Пользователь: ').lower()
-            vacancies, file_object, is_primary_vacancies_update = file_user_menu(vacancies, file_object)
-            if is_primary_vacancies_update:
-                primary_vacancies = vacancies
+            print("\nПрограмма: введите ключевое слово для поиска в названии вакансии")
+            user_answer = input('Пользователь: ')
+            my_db_manager.get_vacancies_with_keyword(user_answer)
 
         if user_input == '6':  # Выход из программы
             print("\nПрограмма: Всего доброго!")
