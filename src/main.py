@@ -60,10 +60,7 @@ def main():
             my_db_manager.get_all_vacancies()
 
         if user_input == '3':  # средняя зарплата по имеющимся вакансиям
-            top_amount = foolproof_user_top_amount_input(len(vacancies))
-            vacancies = sort_vacancies_by_salary_decrease(vacancies)
-            top_vacancies = get_top_vacancies(vacancies, top_amount)
-            print_vacancies(top_vacancies)
+            my_db_manager.get_avg_salary()
 
         if user_input == '4':  # список вакансий, у которых зарплата выше средней по всем вакансиям
             print_vacancies(vacancies)

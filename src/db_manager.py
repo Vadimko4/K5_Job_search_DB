@@ -94,3 +94,15 @@ class DBManager:
                 self.print_vacancies(rows)
 
         conn.close()
+
+    def get_avg_salary(self) -> None:
+        """Получает среднюю зарплату по вакансиям."""
+        conn = psycopg2.connect(dbname=self.database_name, **self.params)
+        with conn.cursor() as cur:
+            cur.execute("SELECT AVG("
+                        "(COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2) "
+                        "FROM vacancies")
+            row = cur.fetchone()
+            print(f'Программа: средняя зарплата по вакансиям базы составляет {int(float(row[0]))} руб')
+
+        conn.close()
