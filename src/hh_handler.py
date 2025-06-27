@@ -117,7 +117,7 @@ class HhHandler:
             # time.sleep(pause_duration)
 
 
-    def erase_old_vacancies(self):
-        """Стирает ранее найденные вакансии для нового поиска"""
-        self.vacancies = []
-        self.params['page'] = 0
+    # def erase_old_vacancies(self):
+    #     """Стирает ранее найденные вакансии для нового поиска"""
+    #     self.vacancies = []
+    #     self.params['page'] = 0

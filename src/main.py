@@ -57,10 +57,7 @@ def main():
             my_db_manager.get_companies_and_vacancies_count()
 
         if user_input == '2':  # список всех вакансий в базе
-            print("\nПрограмма: через пробел введите ключевые слова для поиска в описании вакансии")
-            user_answer = input('Пользователь: ').lower()
-            filter_words = user_answer.split()
-            vacancies = filter_vacancies_by_words(vacancies, filter_words)
+            my_db_manager.get_all_vacancies()
 
         if user_input == '3':  # средняя зарплата по имеющимся вакансиям
             top_amount = foolproof_user_top_amount_input(len(vacancies))
@@ -72,6 +69,8 @@ def main():
             print_vacancies(vacancies)
 
         if user_input == '5':  # список вакансий, в названии которых содержится ключевое слово
+            print("\nПрограмма: через пробел введите ключевые слова для поиска в описании вакансии")
+            user_answer = input('Пользователь: ').lower()
             vacancies, file_object, is_primary_vacancies_update = file_user_menu(vacancies, file_object)
             if is_primary_vacancies_update:
                 primary_vacancies = vacancies
