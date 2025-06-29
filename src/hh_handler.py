@@ -5,9 +5,11 @@
 
 import requests
 from src.config import employers
-
+from src.db_manager import VACANCY_PER_PAGE_OUT
 
 access_token = 'USERH2FNOK2KS7NPVHU2SQG4V2C05906OGGM0EM0TN566KHGBM8APFK3D3ULI11J'
+
+API_VACANCY_PER_PAGE = 2 # не более 100 - задаёт количество вакансий одного работодателя на страницу, всего 20 страниц
 
 
 class ApiError(Exception):
@@ -33,7 +35,8 @@ class HhHandler:
         self.url_vac = 'https://api.hh.ru/vacancies'
         # self.headers = {'Authorization': f'Bearer {access_token}'}
         self.headers = {'User-Agent': 'HH-User-Agent'}
-        self.params = {'page': 0, 'per_page': 2} # получаем до 2 х 20 = 40 вакансий от каждой компании работодателя
+        self.params = {'page': 0, 'per_page': API_VACANCY_PER_PAGE} # получаем до API_VACANCY_PER_PAGE х 20 вакансий
+                                                                    # от каждой компании работодателя
         self.employers = []
         self.vacancies = []
 
