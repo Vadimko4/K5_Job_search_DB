@@ -10,7 +10,7 @@ class DBManager:
     Класс для работы с БД hhvacancies
     """
 
-    def __init__(self, params: dict):
+    def __init__(self, params: dict) -> None:
         """Конструктор класса"""
         self.database_name = "hhvacancies"
         self.employers_table_name = "employers"
@@ -43,13 +43,17 @@ class DBManager:
                     return
 
     def get_companies_and_vacancies_count(self) -> None:
-        """Получает список всех компаний и количество вакансий в базе у каждой компании"""
+        """Получает список всех компаний и количество вакансий в базе у каждой компании в таблице текущих вакансий"""
         conn = psycopg2.connect(dbname=self.database_name, **self.params)
         with conn.cursor() as cur:
-            cur.execute("SELECT e.employer_name, COUNT(v.vacancy_id) AS vacancy_count "
-                        "FROM employers e "
-                        "LEFT JOIN vacancies v ON e.employer_id = v.employer_id "
-                        "GROUP BY e.employer_name")
+            cur.execute("""
+                SELECT employer_name, COUNT(vacancy_name) AS vacancy_count FROM current_vacancies
+                GROUP BY employer_name
+            """)
+            # cur.execute("SELECT e.employer_name, COUNT(v.vacancy_id) AS vacancy_count "
+            #             "FROM employers e "
+            #             "LEFT JOIN vacancies v ON e.employer_id = v.employer_id "
+            #             "GROUP BY e.employer_name")
             rows = cur.fetchall()
             print(f'\n{'-' * 150}')
             for row in rows:
@@ -57,46 +61,68 @@ class DBManager:
 
         conn.close()
 
-    def get_all_vacancies(self) -> None:
+    def get_all_vacancies(self) -> int:
         """
-        Получает список всех вакансий в базе с указанием названия компании,
+        Получает список всех вакансий в таблице текущих вакансий
+        с указанием названия компании,
         названия вакансии и зарплаты и ссылки на вакансию.
+        Возвращает количество вакансий в таблице текущих вакансий.
         """
         conn = psycopg2.connect(dbname=self.database_name, **self.params)
         with conn.cursor() as cur:
-            cur.execute("SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url "
-                        "FROM employers e "
-                        "LEFT JOIN vacancies v ON e.employer_id = v.employer_id")
+            cur.execute("SELECT * FROM current_vacancies")
+            # cur.execute("SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url "
+            #             "FROM employers e "
+            #             "LEFT JOIN vacancies v ON e.employer_id = v.employer_id")
             rows = cur.fetchall()
+            vacancies_count = len(rows)
             if not rows:
                 print("\nПрограмма: в базе нет ни одной вакансии.")
             else:
                 self.print_vacancies(rows)
 
         conn.close()
+        return vacancies_count
 
-    def get_vacancies_with_keyword(self, keyword: str) -> None:
+    def get_vacancies_with_keyword(self, keyword: str) -> int:
         """
-        Получает список всех вакансий, в названии которых содержится ключевое слово keyword.
-        Регистр значения не имеет
+        Получает список всех вакансий, в таблице текущих вакансий,
+        в названии которых содержится ключевое слово keyword.
+        Регистр значения не имеет. Обновляет таблицу текущих вакансий.
+        Возвращает количество вакансий в таблице текущих вакансий.
         """
         conn = psycopg2.connect(dbname=self.database_name, **self.params)
         with conn.cursor() as cur:
-            cur.execute("SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url "
-                        "FROM employers e "
-                        "LEFT JOIN vacancies v ON e.employer_id = v.employer_id "
-                        "WHERE v.vacancy_name ILIKE %s", ('%' + keyword + '%',))
+            cur.execute("DROP TABLE IF EXISTS current_vacancies")
+            # Создаём таблицу текущих вакансий, отфильтрованных из всей базы по ключевому слову
+            cur.execute("""
+                CREATE TABLE current_vacancies AS
+                SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, v.vacancy_url
+                FROM employers e
+                LEFT JOIN vacancies v ON e.employer_id = v.employer_id
+                WHERE v.vacancy_name ILIKE %s
+            """, ('%' + keyword + '%',))
+
+            # cur.execute("SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url "
+            #             "FROM employers e "
+            #             "LEFT JOIN vacancies v ON e.employer_id = v.employer_id "
+            #             "WHERE v.vacancy_name ILIKE %s", ('%' + keyword + '%',))
+            # Выводим результат запроса
+            cur.execute("SELECT * FROM current_vacancies")
             rows = cur.fetchall()
+            vacancies_count = len(rows)
             if not rows:
                 print("\nПрограмма: нет ни одной вакансии по Вашему запросу.")
             else:
                 print(f"\nПрограмма: по Вашему запросу найдено {len(rows)} вакансий.")
                 self.print_vacancies(rows)
 
+        conn.commit()
         conn.close()
+        return vacancies_count
 
     def get_avg_salary(self) -> None:
-        """Получает среднюю зарплату по вакансиям."""
+        """Получает среднюю зарплату по вакансиям в текущей таблице вакансий."""
         conn = psycopg2.connect(dbname=self.database_name, **self.params)
         with conn.cursor() as cur:
             cur.execute("SELECT AVG("
@@ -106,3 +132,27 @@ class DBManager:
             print(f'Программа: средняя зарплата по вакансиям базы составляет {int(float(row[0]))} руб')
 
         conn.close()
+
+    def reset_current_vacancies(self) -> int:
+        """
+        Сбрасывает таблицу текущих вакансий к первоначальному состоянию,
+        когда в ней отображены все вакансии базы данных, без учёта фильтров.
+        В таблице текущих вакансий указаны название компании,
+        название вакансии, зарплата и ссылка на вакансию.
+        Возвращает количество вакансий в таблице текущих вакансий.
+        """
+        conn = psycopg2.connect(dbname=self.database_name, **self.params)
+        with conn.cursor() as cur:
+            cur.execute("DROP TABLE IF EXISTS current_vacancies")
+            cur.execute("""
+                CREATE TABLE current_vacancies AS
+                SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url 
+                FROM employers e 
+                LEFT JOIN vacancies v ON e.employer_id = v.employer_id""")
+            cur.execute("SELECT * FROM current_vacancies")
+            rows = cur.fetchall()
+            vacancies_count = len(rows)
+
+        conn.commit()
+        conn.close()
+        return vacancies_count
