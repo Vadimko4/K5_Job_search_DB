@@ -1,7 +1,7 @@
 """Модуль с классом для работы с API HH"""
-from http.client import responses
-import time
-import random
+# from http.client import responses
+# import time
+# import random
 
 import requests
 from src.config import employers
@@ -115,9 +115,3 @@ class HhHandler:
             # Пауза между запросами в секундах - когда не используем токен доступа к hh api
             # pause_duration = random.randint(2, 7)
             # time.sleep(pause_duration)
-
-
-    # def erase_old_vacancies(self):
-    #     """Стирает ранее найденные вакансии для нового поиска"""
-    #     self.vacancies = []
-    #     self.params['page'] = 0

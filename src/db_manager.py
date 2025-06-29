@@ -50,10 +50,6 @@ class DBManager:
                 SELECT employer_name, COUNT(vacancy_name) AS vacancy_count FROM current_vacancies
                 GROUP BY employer_name
             """)
-            # cur.execute("SELECT e.employer_name, COUNT(v.vacancy_id) AS vacancy_count "
-            #             "FROM employers e "
-            #             "LEFT JOIN vacancies v ON e.employer_id = v.employer_id "
-            #             "GROUP BY e.employer_name")
             rows = cur.fetchall()
             print(f'\n{'-' * 150}')
             for row in rows:
@@ -63,7 +59,7 @@ class DBManager:
 
     def get_all_vacancies(self) -> int:
         """
-        Получает список всех вакансий в таблице текущих вакансий
+        Получает и выводит список всех вакансий в таблице текущих вакансий
         с указанием названия компании,
         названия вакансии и зарплаты и ссылки на вакансию.
         Возвращает количество вакансий в таблице текущих вакансий.
@@ -71,9 +67,6 @@ class DBManager:
         conn = psycopg2.connect(dbname=self.database_name, **self.params)
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM current_vacancies")
-            # cur.execute("SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url "
-            #             "FROM employers e "
-            #             "LEFT JOIN vacancies v ON e.employer_id = v.employer_id")
             rows = cur.fetchall()
             vacancies_count = len(rows)
             if not rows:
@@ -86,7 +79,7 @@ class DBManager:
 
     def get_vacancies_with_keyword(self, keyword: str) -> int:
         """
-        Получает список всех вакансий, в таблице текущих вакансий,
+        Получает и выводит список всех вакансий в таблице текущих вакансий,
         в названии которых содержится ключевое слово keyword.
         Регистр значения не имеет. Обновляет таблицу текущих вакансий.
         Возвращает количество вакансий в таблице текущих вакансий.
@@ -103,10 +96,6 @@ class DBManager:
                 WHERE v.vacancy_name ILIKE %s
             """, ('%' + keyword + '%',))
 
-            # cur.execute("SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url "
-            #             "FROM employers e "
-            #             "LEFT JOIN vacancies v ON e.employer_id = v.employer_id "
-            #             "WHERE v.vacancy_name ILIKE %s", ('%' + keyword + '%',))
             # Выводим результат запроса
             cur.execute("SELECT * FROM current_vacancies")
             rows = cur.fetchall()
@@ -125,11 +114,38 @@ class DBManager:
         """Получает среднюю зарплату по вакансиям в текущей таблице вакансий."""
         conn = psycopg2.connect(dbname=self.database_name, **self.params)
         with conn.cursor() as cur:
-            cur.execute("SELECT AVG("
-                        "(COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2) "
-                        "FROM vacancies")
+            cur.execute("""
+                SELECT AVG((COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2) 
+                FROM current_vacancies
+            """)
             row = cur.fetchone()
-            print(f'Программа: средняя зарплата по вакансиям базы составляет {int(float(row[0]))} руб')
+            print(f'\nПрограмма: средняя зарплата по вакансиям базы составляет {int(float(row[0]))} руб')
+
+        conn.close()
+
+    def get_vacancies_with_higher_salary(self) -> None:
+        """
+        Получает и выводит список всех вакансий в текущей таблице, у которых зарплата выше средней по всем вакансиям
+        """
+        conn = psycopg2.connect(dbname=self.database_name, **self.params)
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT * FROM current_vacancies 
+                WHERE salary_from > (
+                    SELECT AVG((COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2) 
+                    FROM current_vacancies)
+                OR
+                    salary_to > (
+                    SELECT AVG((COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2) 
+                    FROM current_vacancies)
+            """)
+            rows = cur.fetchall()
+            vacancies_count = len(rows)
+            if not vacancies_count:
+                print("\nПрограмма: в текущей таблице нет ни одной подходящей вакансии.")
+            else:
+                print(f"\nПрограмма: по Вашему запросу найдено {vacancies_count} вакансий.")
+                self.print_vacancies(rows)
 
         conn.close()
 

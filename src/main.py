@@ -1,5 +1,4 @@
 import datetime
-import time
 
 from src.hh_handler import HhHandler
 from src.db_manager import DBManager
@@ -63,10 +62,13 @@ def main():
             my_db_manager.get_all_vacancies()
 
         if user_input == '3':  # средняя зарплата по имеющимся вакансиям
-            my_db_manager.get_avg_salary()
+            if not vacancies_count:
+                print("\nПрограмма: в текущей таблице нет вакансий. Среднюю зарплату посчитать не получится.")
+            else:
+                my_db_manager.get_avg_salary()
 
         if user_input == '4':  # список вакансий, у которых зарплата выше средней по всем вакансиям
-            print_vacancies(vacancies)
+            my_db_manager.get_vacancies_with_higher_salary()
 
         if user_input == '5':  # список вакансий, в названии которых содержится ключевое слово
             print("\nПрограмма: введите ключевое слово для поиска в названии вакансии")
