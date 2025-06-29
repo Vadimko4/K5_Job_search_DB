@@ -1,8 +1,9 @@
 import time
 from datetime import timedelta
 
-from src.hh_handler import HhHandler
 import psycopg2
+
+from src.hh_handler import HhHandler
 
 
 def user_menu_out():
@@ -58,7 +59,7 @@ def create_database(database_name: str, params: dict) -> None:
     conn = psycopg2.connect(dbname=database_name, **params)
     with conn.cursor() as cur:
         cur.execute("""
-                    CREATE TABLE employers (                        
+                    CREATE TABLE employers (
                         employer_id INTEGER PRIMARY KEY,
                         employer_name VARCHAR(255) NOT NULL,
                         employer_url TEXT,
@@ -101,7 +102,7 @@ def save_data_to_database(hh_object: HhHandler, database_name: str, params: dict
         for vacancy in hh_object.vacancies:
             cur.execute(
                 """
-                INSERT INTO vacancies (employer_id, vacancy_name, vacancy_url, 
+                INSERT INTO vacancies (employer_id, vacancy_name, vacancy_url,
                 salary_from, salary_to, description)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 RETURNING vacancy_id

@@ -1,10 +1,9 @@
 import datetime
 
-from src.hh_handler import HhHandler
-from src.db_manager import DBManager
 from src.config import config
-from src.utils import (create_database, save_data_to_database, time_delay,
-                       user_menu_out, foolproof_user_menu_input)
+from src.db_manager import DBManager
+from src.hh_handler import HhHandler
+from src.utils import create_database, foolproof_user_menu_input, save_data_to_database, time_delay, user_menu_out
 
 
 def main():
@@ -85,4 +84,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

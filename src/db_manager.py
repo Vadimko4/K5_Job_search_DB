@@ -1,6 +1,6 @@
-import psycopg2
 from typing import Any
 
+import psycopg2
 
 VACANCY_PER_PAGE_OUT = 5
 
@@ -115,7 +115,7 @@ class DBManager:
         conn = psycopg2.connect(dbname=self.database_name, **self.params)
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT AVG((COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2) 
+                SELECT AVG((COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2)
                 FROM current_vacancies
             """)
             row = cur.fetchone()
@@ -130,13 +130,13 @@ class DBManager:
         conn = psycopg2.connect(dbname=self.database_name, **self.params)
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT * FROM current_vacancies 
+                SELECT * FROM current_vacancies
                 WHERE salary_from > (
-                    SELECT AVG((COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2) 
+                    SELECT AVG((COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2)
                     FROM current_vacancies)
                 OR
                     salary_to > (
-                    SELECT AVG((COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2) 
+                    SELECT AVG((COALESCE(salary_from, 0) + COALESCE(salary_to, salary_from)) / 2)
                     FROM current_vacancies)
             """)
             rows = cur.fetchall()
@@ -162,8 +162,8 @@ class DBManager:
             cur.execute("DROP TABLE IF EXISTS current_vacancies")
             cur.execute("""
                 CREATE TABLE current_vacancies AS
-                SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url 
-                FROM employers e 
+                SELECT e.employer_name, v.vacancy_name, v.salary_from, v.salary_to, vacancy_url
+                FROM employers e
                 LEFT JOIN vacancies v ON e.employer_id = v.employer_id""")
             cur.execute("SELECT * FROM current_vacancies")
             rows = cur.fetchall()
