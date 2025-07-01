@@ -1,0 +1,6 @@
+# В папке src создайте файл database.ini из копии этого файла и замените значения переменных реальными данными
+[postgresql]
+host=your_host_name # введите имя вашего host
+user=your_user_name # введите ваше имя пользователя
+password=your_password # введите ваш пароль
+port=your_port # введите адрес вашего порта
